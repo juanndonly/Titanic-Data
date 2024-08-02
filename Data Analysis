@@ -1,0 +1,60 @@
+%matplotlib inline
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import sqlite3
+import os
+import seaborn as sns
+plt.style.use('bmh')
+
+file_path = r"C:\Users\JUAN\Downloads\titanic.csv"
+data = pd.read_csv(file_path)
+data.head()
+
+num_passengers = data.shape[0]
+print(num_passengers)
+
+missing_values = data.isnull().sum()
+print(missing_values)
+
+class_distribution = data['Pclass'].value_counts()
+print(class_distribution)
+
+age_distribution = data['Age'].value_counts()
+print(age_distribution)
+sex_distribution = data['Sex'].value_counts()
+print(sex_distribution)
+
+plt.figure(figsize=(10, 6))
+sns.histplot(data['Age'], kde=True)
+plt.title('Age Distribution of Passengers')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(6,6))
+sns.countplot(x='Sex', data=data)
+plt.title("Gender Distribution of Passengers")
+plt.xlabel("Gender")
+plt.ylabel("Count")
+plt.show()
+
+data['FamilySize'] = data['Siblings/Spouses Aboard'] + data['Parents/Children Aboard']
+data['IsAlone'] = data['FamilySize'] == 0
+alone_distribution = data['IsAlone'].value_counts()
+print(alone_distribution)
+
+survival_rate = data['Survived'].sum()/num_passengers
+print(f'The overall survival rate is {survival_rate * 100:.2f}%')
+
+survival_by_class = data.groupby('Pclass')['Survived'].sum()
+print(survival_by_class)
+survival_by_gender = data.groupby('Sex')['Survived'].sum()
+print(survival_by_gender)
+
+bins = [0,12,17,35,60,100]
+labels = ['Child', 'Teen', 'Young Adult', 'Adult', 'Senior']
+data['AgeGroup'] = pd.cut(data['Age'], bins=bins, labels=labels)
+survival_by_age_group = data.groupby('AgeGroup')['Survived'].sum()
+print(survival_by_age_group)
+
